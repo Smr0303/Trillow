@@ -6,30 +6,45 @@ const tokens = (n) => {
 }
 
 describe('Escrow', () => {
-it("saves the address",async()=>{
-    let buyer ,seller,inspector,lender;
+let buyer ,seller,inspector,lender;
+let realEstate,escrow;
 
-     const RealEstate = await ethers.getContractFactory("RealEstate");
-     const realEstate = await RealEstate.deploy();
-
+beforeEach(async() => {
+    const RealEstate = await ethers.getContractFactory("RealEstate");
+     realEstate = await RealEstate.deploy();
     [buyer,seller,inspector,lender] = await ethers.getSigners();
-
 
     await realEstate.connect(seller);
     const tx = await realEstate.mint("https://ipfs.io/ipfs/QmTudSYeM7mz3PkYEWXWqPjomRPHogcMFSq7XAvsvsgAPS")
     const txReceipt = await tx.wait()
-   
 
     const Escrow = await ethers.getContractFactory("Escrow");
-    const escrow = await Escrow.deploy(realEstate.address, lender.address, inspector.address, seller.address);
-
-    const result = await escrow.nftAddress();
-    expect(result).to.be.equal(realEstate.address);
-
-    const res = await escrow.seller();
-    expect(res).to.be.equal(seller.address);
-
-    //  "https://ipfs.io/ipfs/QmTudSYeM7mz3PkYEWXWqPjomRPHogcMFSq7XAvsvsgAPS"
-
+     escrow = await Escrow.deploy(realEstate.address, lender.address, inspector.address, seller.address);
 });
+
+describe('Deployment', () => {
+    it('Returns NFT address', async () => {
+        const result = await escrow.nftAddress()
+        expect(result).to.be.equal(realEstate.address)
+    })
+
+    it('Returns seller', async () => {
+        const result = await escrow.seller()
+        expect(result).to.be.equal(seller.address)
+    })
+
+    it('Returns inspector', async () => {
+        const result = await escrow.inspector()
+        expect(result).to.be.equal(inspector.address)
+    })
+
+    it('Returns lender', async () => {
+        const result = await escrow.lender()
+        expect(result).to.be.equal(lender.address)
+    })
+})
+
+
+
+
 })
