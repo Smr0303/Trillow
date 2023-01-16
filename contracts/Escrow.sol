@@ -15,10 +15,24 @@ contract Escrow {
    address public inspector;
    address public nftAddress;
 
-   constructor (address _nftAddress, address _lender, address _inspector, address _seller){
+
+   mapping(uint256 => bool) public isListed;
+
+   constructor (  address _nftAddress,
+        address payable _seller,
+        address _inspector,
+        address _lender){
     seller = payable(_seller);
     lender = _lender;
     inspector = _inspector;
     nftAddress = _nftAddress; 
+   }
+
+
+   function list(uint256 _nftID) public {
+    //Transferring token ownership 
+    IERC721(nftAddress).transferFrom(msg.sender, address(this),_nftID);
+
+    isListed[_nftID] = true;
    }
 }
