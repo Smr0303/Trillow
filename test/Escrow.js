@@ -33,8 +33,7 @@ describe("Escrow", () => {
     const tx1 = await realEstate.connect(seller).approve(escrow.address,1);
     tx1.wait();
     //Update Listing
-
-    const tx2 = await escrow.connect(seller).list(1);
+    const tx2 = await escrow.connect(seller).list(1, buyer.address,tokens(10), tokens(5));
     tx2.wait();
   });
 
@@ -64,6 +63,42 @@ describe("Escrow", () => {
     it("Updates owner", async () => {
       expect(await realEstate.ownerOf(1)).to.be.equal(escrow.address);
     });
+
+    it("Updates the listing",async()=>{
+      expect(await escrow.isListed(1)).to.be.equal(true);
+    });
+    it("Updates the buyer",async()=>{
+      expect(await escrow.buyer(1)).to.be.equal(buyer.address);
+    });
+    it("Updates the purchasePrice",async()=>{
+      expect(await escrow.purchasePrice(1)).to.be.equal(tokens(10));
+    });
+    it("Updates the escrowAmount",async()=>{
+      expect(await escrow.escrowAmount(1)).to.be.equal(tokens(5));
+    });
+
+  });
+
+  describe("Deposits", () => {
+    it("Updates contract balance", async () => {
+      
+      const tx3 = await escrow.depositEarnest(1,{value:tokens(5)}) 
+      await tx3.wait();
+      expect(await escrow.getBalance()).to.be.equal(tokens(5));
+    });
+
+    // it("Updates the listing",async()=>{
+    //   expect(await escrow.isListed(1)).to.be.equal(true);
+    // });
+    // it("Updates the buyer",async()=>{
+    //   expect(await escrow.buyer(1)).to.be.equal(buyer.address);
+    // });
+    // it("Updates the purchasePrice",async()=>{
+    //   expect(await escrow.purchasePrice(1)).to.be.equal(tokens(10));
+    // });
+    // it("Updates the escrowAmount",async()=>{
+    //   expect(await escrow.escrowAmount(1)).to.be.equal(tokens(5));
+    // });
 
   });
 });

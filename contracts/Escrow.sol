@@ -9,6 +9,10 @@ interface IERC721 {
     ) external;
 }
 
+error NotSeller();
+error LessAmountSent();
+error NotBuyer();
+
 contract Escrow {
    address payable public seller;
    address public lender;
@@ -17,6 +21,9 @@ contract Escrow {
 
 
    mapping(uint256 => bool) public isListed;
+   mapping(uint256=>uint256) public purchasePrice;
+   mapping(uint256=>uint256) public escrowAmount;
+   mapping(uint256=>address) public buyer;
 
    constructor (  address _nftAddress,
         address payable _seller,
@@ -29,10 +36,40 @@ contract Escrow {
    }
 
 
-   function list(uint256 _nftID) public {
+ modifier onlySeller (){
+    if (msg.sender != seller){
+        revert NotSeller();
+    }
+   _;
+
+ }
+     modifier onlyBuyer (uint256 _nftID){
+    if (msg.sender != buyer[_nftID]){
+        revert NotBuyer();
+    }
+   _;
+     }
+
+
+   function list(uint256 _nftID, address _buyer, uint256 _purchasePrice, uint256 _escrowAmount) public onlySeller {
     //Transferring token ownership 
     IERC721(nftAddress).transferFrom(msg.sender, address(this),_nftID);
-
+   //updated mapping
     isListed[_nftID] = true;
+    buyer[1] = _buyer;
+    purchasePrice[1] = _purchasePrice;
+    escrowAmount[1] = _escrowAmount;
    }
+
+   function depositEarnest(uint256 _nftID) public payable onlyBuyer(_nftID){
+     if(msg.value < escrowAmount[_nftID]){
+        revert LessAmountSent();
+     }
+   }
+
+ receive() external payable{}
+
+function getBalance() public view returns(uint256) {
+ return address(this).balance;
+}
 }
