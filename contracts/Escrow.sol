@@ -12,6 +12,7 @@ interface IERC721 {
 error NotSeller();
 error LessAmountSent();
 error NotBuyer();
+error NotInspector();
 
 contract Escrow {
    address payable public seller;
@@ -24,6 +25,8 @@ contract Escrow {
    mapping(uint256=>uint256) public purchasePrice;
    mapping(uint256=>uint256) public escrowAmount;
    mapping(uint256=>address) public buyer;
+   mapping(uint256=>bool) public inspectionPassed;
+   mapping(uint256=>mapping(address => bool)) public approval;
 
    constructor (  address _nftAddress,
         address payable _seller,
@@ -49,7 +52,12 @@ contract Escrow {
     }
    _;
      }
-
+  modifier onlyInspector (){
+    if (msg.sender != inspector){
+        revert NotInspector();
+    }
+   _;
+     }
 
    function list(uint256 _nftID, address _buyer, uint256 _purchasePrice, uint256 _escrowAmount) public onlySeller {
     //Transferring token ownership 
@@ -66,6 +74,37 @@ contract Escrow {
         revert LessAmountSent();
      }
    }
+
+  function updateInspectionStatus(uint256 _nftID) public onlyInspector {
+    inspectionPassed[_nftID] = true;
+  }
+
+  function approveSale(uint256 _nftID) public  {
+    approval[_nftID][msg.sender] = true;
+  }
+
+function finalizeSale(uint256 _nftID) public {
+require(inspectionPassed[_nftID] == true);
+require(approval[_nftID][buyer[_nftID]] == true);
+require(approval[_nftID][seller] == true);
+require(approval[_nftID][lender] == true);
+
+require(address(this).balance >= purchasePrice[_nftID]);
+//transferred the funds
+(bool success,)= payable(seller).call{value: address(this).balance}("");
+require(success);
+//Transferred the nft
+IERC721(nftAddress).transferFrom(address(this), buyer[_nftID],_nftID);
+}
+
+function cancelSale(uint256 _nftID) public {
+    if(inspectionPassed[_nftID] == false){
+        payable(buyer[_nftID]).transfer(address(this).balance);
+    }
+    else{
+        payable(seller).transfer(address(this).balance);
+    }
+}
 
  receive() external payable{}
 
