@@ -18,7 +18,10 @@ function App() {
   const [provider, setProvider] = useState(null);
   const [escrow, setEscrow] = useState(null);
   const [homes,setHomes]= useState([]);
-  
+  const [home, setHome] = useState(null);
+  const [toggle, setToggle] = useState(false);
+
+
   const loadBlockchainData = async()=>{
     if(typeof window.ethereum === "undefined"){
       alert("Please install metamask");
@@ -62,6 +65,11 @@ function App() {
     loadBlockchainData();
   },[])
 
+  const togglePop=async(home)=>{
+    console.log(home);
+    setToggle(true);
+  }
+
   return (
     <div>
       <Navigation account={account} setAccount={setAccount}/>
@@ -75,7 +83,7 @@ function App() {
 
         <div className='cards'>
           {homes.map((home, index) => (
-            <div className='card' key={index} >
+            <div className='card' key={index} onClick={()=> togglePop(home) }>
               <div className='card__image'>
                 <img src={home.image} alt="Home" />
               </div>
@@ -94,12 +102,12 @@ function App() {
 
       </div>
 
-      {/* {toggle && (
-        <Home home={home} provider={provider} account={account} escrow={escrow} togglePop={togglePop} />
-      )} */}
+    {toggle && (
+      <Home home={home} provider={provider} account={account} escrow={escrow} togglePop={togglePop} />
+    )}
 
     </div>
-  );
+  ); 
 }
 
 export default App;
