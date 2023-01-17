@@ -66,7 +66,7 @@ function App() {
   },[])
 
   const togglePop=async(home)=>{
-    console.log(home);
+    setHome(home);
     setToggle(true);
   }
 
