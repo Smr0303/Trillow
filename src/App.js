@@ -14,13 +14,35 @@ import Escrow from './abis/Escrow.json'
 import config from './config.json';
 
 function App() {
+  const [account,setAccount] = useState(null);
+
+  const loadBlockchainData = async()=>{
+    if(typeof window.ethereum === "undefined"){
+      alert("Please install metamask");
+    }
+    else{
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+       window.ethereum.on("accountsChanged", async() =>{
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = ethers.utils.getAddress(accounts[0])
+        setAccount(account); 
+       }) 
+    
+    }
+
+
+  }
+  useEffect(()=>{
+    loadBlockchainData();
+  },[])
 
   return (
     <div>
+      <Navigation account={account} setAccount={setAccount}/>
 
       <div className='cards__section'>
 
-        <h3>Welcome to Millow</h3>
+        <h3>Welcome to Trillow</h3>
 
       </div>
 
