@@ -64,9 +64,9 @@ contract Escrow {
     IERC721(nftAddress).transferFrom(msg.sender, address(this),_nftID);
    //updated mapping
     isListed[_nftID] = true;
-    buyer[1] = _buyer;
-    purchasePrice[1] = _purchasePrice;
-    escrowAmount[1] = _escrowAmount;
+    buyer[_nftID] = _buyer;
+    purchasePrice[_nftID] = _purchasePrice;
+    escrowAmount[_nftID] = _escrowAmount;
    }
 
    function depositEarnest(uint256 _nftID) public payable onlyBuyer(_nftID){

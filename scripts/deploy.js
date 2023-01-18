@@ -27,6 +27,7 @@ async function main() {
     inspector.address,
     lender.address
   );
+  console.log(escrow.address);
 
   await escrow.deployed();
 

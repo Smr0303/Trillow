@@ -60,13 +60,13 @@ const Home = ({ home, provider, account,escrow, togglePop }) => {
 }
 
 const inspectHandler = async () => {
-    const signer = await provider.getSigner()
+  const signer = await provider.getSigner()
 
-    // Inspector updates status
-    const transaction = await escrow.connect(signer).updateInspectionStatus(home.id, true)
-    await transaction.wait()
+  // Inspector updates status
+  const transaction = await escrow.connect(signer).updateInspectionStatus(home.id, true)
+  await transaction.wait()
 
-    setHasInspected(true)
+  setHasInspected(true)
 }
 
 const lendHandler = async () => {

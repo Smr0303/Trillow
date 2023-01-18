@@ -53,7 +53,6 @@ function App() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = ethers.utils.getAddress(accounts[0])
         setAccount(account); 
-        console.log(account);
         
       }) 
       
