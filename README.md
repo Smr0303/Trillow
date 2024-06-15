@@ -2,6 +2,9 @@
 
 ## Technology Stack & Tools
 
+![Alt text](smartmockups_lxgdhuyf.jpg)
+
+
 - Solidity (Writing Smart Contracts & Tests)
 - Javascript (React & Testing)
 - [Hardhat](https://hardhat.org/) (Development Framework)
