@@ -44,20 +44,40 @@ const Home = ({ home, provider, account,escrow, togglePop }) => {
   }
 
   const buyHandler = async () => {
-    const escrowAmount = await escrow.escrowAmount(home.id)
-    const signer = await provider.getSigner()
+    const escrowAmountBigNumber = await escrow.escrowAmount(home.id);
+    const signer = await provider.getSigner();
 
-    // Buyer deposit earnest
-    console.log(escrowAmount);
-    let transaction = await escrow.connect(signer).depositEarnest(home.id, { value: escrowAmount })
-    await transaction.wait()
 
-    // Buyer approves...
-    transaction = await escrow.connect(signer).approveSale(home.id)
-    await transaction.wait()
+    const escrowAmount = escrowAmountBigNumber.toString();
 
-    setHasBought(true)
-}
+
+    const divisor = ethers.BigNumber.from("1000000000000"); 
+    const scaledAmount = ethers.BigNumber.from(escrowAmount).div(divisor);
+
+    console.log('Scaled escrow amount:', scaledAmount.toString());
+
+    // Convert scaled amount to string and format as ether
+    const scaledAmountInEth = ethers.utils.formatUnits(scaledAmount, 18);
+
+    console.log('Scaled escrow amount in ETH:', scaledAmountInEth);
+
+    try {
+        let transaction = await escrow.connect(signer).depositEarnest(home.id, { value: ethers.utils.parseEther(scaledAmountInEth) });
+        await transaction.wait();
+
+        // Buyer approves the sale
+        transaction = await escrow.connect(signer).approveSale(home.id);
+        await transaction.wait();
+
+        setHasBought(true);
+    } catch (err) {
+        console.log(err);
+        alert("Not having enough funds");
+    }
+};
+
+
+
 
 const inspectHandler = async () => {
   const signer = await provider.getSigner()
