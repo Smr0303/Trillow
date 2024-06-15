@@ -55,3 +55,10 @@ main()
   .catch((err) => {
     process.exit(1);
   });
+
+
+//   samarjeetmohite@Samarjeets-MacBook-Pro-2 Trillow4907 % npx hardhat run ./scripts/deploy.js --network sepolia
+// Deployed real Estate: 0x3Fc52652c31213696438768304FD352C7DB8de9d
+// Minting 3 properties
+// 0xE5e932d70a3d1c840852cBCBDAE0769053B9b016
+// Finished

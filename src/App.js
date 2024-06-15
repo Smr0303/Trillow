@@ -42,6 +42,7 @@ function App() {
         const uri = await realEstate.tokenURI(i+1);
         const res = await fetch(uri);
         const metadata = await res.json();
+        console.log(metadata);
         homesArray.push(metadata);
       }
       await setHomes(homesArray);
