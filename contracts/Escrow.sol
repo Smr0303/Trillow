@@ -1,12 +1,19 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
-interface IERC721 {
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _id
-    ) external;
+interface IERC4907 is IERC721{
+    event UpdateUser(
+        uint256 indexed tokenId,
+        address indexed user,
+        uint64 indexed expires
+    );
+
+    function setUser(uint256 tokenId, address user, uint256 expires) external;
+
+    function userOf(uint256 tokenId) external view returns (address);
+
+    function userExpires(uint256 tokenId) external view returns (uint256);
 }
 
 error NotSeller();
@@ -61,13 +68,13 @@ contract Escrow {
 
    function list(uint256 _nftID, address _buyer, uint256 _purchasePrice, uint256 _escrowAmount) public onlySeller {
     //Transferring token ownership 
-    IERC721(nftAddress).transferFrom(msg.sender, address(this),_nftID);
+    IERC4907(nftAddress).transferFrom(msg.sender, address(this),_nftID);
    //updated mapping
     isListed[_nftID] = true;
     buyer[_nftID] = _buyer;
     purchasePrice[_nftID] = _purchasePrice;
     escrowAmount[_nftID] = _escrowAmount;
-   }
+   }  
 
    function depositEarnest(uint256 _nftID) public payable onlyBuyer(_nftID){
      if(msg.value < escrowAmount[_nftID]){
@@ -94,7 +101,7 @@ require(address(this).balance >= purchasePrice[_nftID]);
 (bool success,)= payable(seller).call{value: address(this).balance}("");
 require(success);
 //Transferred the nft
-IERC721(nftAddress).transferFrom(address(this), buyer[_nftID],_nftID);
+IERC4907(nftAddress).transferFrom(address(this), buyer[_nftID],_nftID);
 }
 
 function cancelSale(uint256 _nftID) public {
